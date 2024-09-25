@@ -3,6 +3,7 @@ package Chapter_15.BeatBox;
 import javax.sound.midi.*;
 import javax.swing.*;
 import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 
 import static javax.sound.midi.ShortMessage.*;
@@ -54,6 +55,15 @@ public class BeatBox {
         JButton downTempo = new JButton("Tempo Down");
         downTempo.addActionListener(e -> changeTempo(0.97f));
         buttnBox.add(downTempo);
+
+        JButton serialize = new JButton("Serialize it");
+        serialize.addActionListener(e -> write());
+        buttnBox.add(serialize);
+
+
+        JButton restoreBtn = new JButton("Restore");
+        restoreBtn.addActionListener(e -> readFile());
+        buttnBox.add(restoreBtn);
 
         Box nameBox = new Box(BoxLayout.Y_AXIS);
         for(String instrumentName: instrumentNames){
@@ -176,6 +186,59 @@ public class BeatBox {
                 track.add(makeEvent(NOTE_OFF, 9, key, 100, i+1));
             }
         }
+    }
+
+    /**
+     *
+     */
+    private void write(){
+        // make a boolean array to hold the state of each checkbox
+        boolean[]checkboxState = new boolean[256];
+        /*
+         * Walk throught the checkbox list
+         * Get the state of each one
+         * Add it to the boolean array
+         */
+        for (int i = 0; i < 256; i++) {
+            JCheckBox check = checkBoxArrayList.get(i);
+            if (check.isSelected()){
+                checkboxState[i] = true;
+            }
+        }
+        // try-with-resources
+        try(ObjectOutputStream os =
+                new ObjectOutputStream(new FileOutputStream("./src/chapter_15/checkbox.ser"))){
+            os.writeObject(checkboxState);
+        }catch (IOException ex){
+            ex.printStackTrace();
+        }
+    }
+
+    private void readFile(){
+        boolean[] checkboxState = null;
+        try (ObjectInputStream is =
+                new ObjectInputStream(new FileInputStream("./src/chapter_15/checkbox.ser"))){
+            /*
+             * Read the single object in the file and cast it back to a boolean array
+             * `readObject()` returns a reference of type Object()
+             */
+            checkboxState = (boolean[]) is.readObject();
+        } catch (Exception ex){
+            ex.printStackTrace();
+        }
+        /*
+         * Restore the state of each of the checboxes in the arrayList of actual JCheckBox objects
+         */
+        for (int i = 0; i < 256; i++) {
+            JCheckBox check = checkBoxArrayList.get(i);
+            check.setSelected(checkboxState[i]);
+        }
+        /*
+         * Now stop whatever is currently playing and rebuild the sequence using the new
+         * state of the checkboxes in the ArrayList
+         */
+        sequencer.stop();
+        buildTrackAndStart();
     }
 
 }

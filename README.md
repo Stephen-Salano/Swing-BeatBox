@@ -2,12 +2,14 @@
 
 Cyber BeatBox is a simple drum machine built in Java using the `javax.sound.midi` package. It allows users to sequence and play various drum beats in a grid-like interface, much like popular drum machines. This project demonstrates the use of MIDI, Swing for GUI development, and basic event handling in Java.
 _![Beat Box UI](img_1.png)_
+_![New UI](img_2.png)_ New Ui
 
 ## Features
 - A 16x16 grid of checkboxes, where each row represents an instrument, and each column represents a beat in the measure.
 - Start and stop functionality for the sequencer.
 - Tempo control to speed up or slow down the beats.
 - 16 different instruments that can be combined to create complex beats.
+- Beats can be serialized to store the state and restored later
 
 ## Instruments
 The following MIDI drum instruments are used in the BeatBox:
